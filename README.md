@@ -1,0 +1,2 @@
+ # SCOOLPORT
+Scool Port is a business name that combines the words "school" and "portal" to create a unique and memorable name for a student school portal. The name suggests that the platform is a gateway or entry point for students to access various school-related services such as result checking, course registration, profile updates, fee payments, and student schedules. 
