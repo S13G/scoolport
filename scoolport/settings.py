@@ -101,7 +101,7 @@ CORS_ALLOW_CREDENTIALS = True
 SPECTACULAR_SETTINGS = {
     "TITLE": "SCOOLPORT API",
     "DESCRIPTION": """
-    🚀 ScoolPort is a business name that combines the words "school" and "portal" to create a unique and memorable name for a student school portal. The name suggests that the platform is a gateway or entry point for students to access various school-related services such as result checking, course registration, profile updates, fee payments, and student schedules.  🌟👩‍🎓👨‍
+    🚀 Scool Port is a platform gateway or entry point for students to access various school-related services such as result checking, course registration, profile updates, fee payments, and student schedules.   🌟👩‍🎓👨‍
     """,
     "VERSION": "1.0.0",
     "CONTACT": "ayflix0@gmail.com",
@@ -268,6 +268,16 @@ JAZZMIN_SETTINGS = {
     "icons": {
         "core.group": "fas fa-users",
         "core.user": "fas fa-universal-access",
+        "core.studentprofile": "fas fa-user-graduate",
+        "core.level": "fas fa-layer-group",
+        "core.faculty": "fas fa-university",
+        "core.department": "fas fa-building",
+        "portal.course": "fas fa-book-open",
+        "portal.session": "fas fa-calendar",
+        "portal.semester": "fas fa-calendar-alt",
+        "portal.result": "fas fa-graduation-cap",
+        "portal.courseregistration": "fas fa-user-plus",
+        "misc.faq": "fas fa-question",
     },
     # Icons that are used when one is not manually specified
     "default_icon_parents": "fas fa-chevron-circle-right",
