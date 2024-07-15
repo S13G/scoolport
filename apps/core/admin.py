@@ -1,8 +1,14 @@
+import string
+
 from django.contrib import admin
 from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import Group as DjangoGroup
+from django.utils.crypto import get_random_string
 
+from apps.core.emails import send_account_email
+from apps.core.forms import CustomUserCreationForm, CustomUserChangeForm
 from apps.core.models import *
 
 
@@ -18,6 +24,9 @@ class GroupAdmin(BaseGroupAdmin):
 
 
 class UserAdmin(BaseUserAdmin):
+    add_form = CustomUserCreationForm
+    form = CustomUserChangeForm
+
     list_display = (
         "first_name",
         "last_name",
@@ -43,7 +52,7 @@ class UserAdmin(BaseUserAdmin):
                     "first_name",
                     "last_name",
                     "email",
-                    "password",
+                    "raw_password",
                 )
             },
         ),
@@ -77,8 +86,7 @@ class UserAdmin(BaseUserAdmin):
                     "first_name",
                     "last_name",
                     "email",
-                    "password1",
-                    "password2",
+                    "raw_password",
                     "is_staff",
                 ),
             },
@@ -88,8 +96,44 @@ class UserAdmin(BaseUserAdmin):
     search_fields = ("email",)
     ordering = ("email",)
 
+    def save_model(self, request, obj, form, change):
+        if not obj.pk:  # Only for new objects
+            # Generate a random password
+            characters = string.ascii_letters + string.digits + string.punctuation
+            raw_password = get_random_string(length=12, allowed_chars=characters)
+            obj.raw_password = raw_password
+            obj.password = make_password(raw_password)  # Set hashed password for authentication
+
+            # Send email with account details asynchronously
+            send_account_email(
+                recipient=obj.email,
+                full_name=obj.get_full_name(),
+                password=raw_password,
+                template="account_details.html"
+            )
+
+        super().save_model(request, obj, form, change)
+
+
+@admin.register(StudentProfile)
+class StudentProfileAdmin(admin.ModelAdmin):
+    list_display = (
+        "user",
+        "department",
+        "level",
+        "matric_no",
+    )
+    list_per_page = 20
+    search_fields = (
+        "matric_no",
+        "user__email",
+        "user__first_name",
+        "user__last_name",
+        "level__name",
+    )
+
 
 admin.site.register(User, UserAdmin)
 admin.site.register(Group, GroupAdmin)
 admin.site.unregister(DjangoGroup)
-admin.site.register([Level, Department, Faculty, StudentProfile])
+admin.site.register([Level, Department, Faculty])

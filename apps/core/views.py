@@ -40,10 +40,6 @@ class LoginView(TokenObtainPairView):
             raise RequestError(err_code=ErrorCode.INVALID_CREDENTIALS, err_msg="Invalid credentials",
                                status_code=status.HTTP_401_UNAUTHORIZED)
 
-        if not user.email_verified:
-            raise RequestError(err_code=ErrorCode.UNVERIFIED_USER, err_msg="Verify your email first",
-                               status_code=status.HTTP_400_BAD_REQUEST)
-
         # tokens
         tokens_response = super().post(request)
         tokens = {"refresh": tokens_response.data['refresh'], "access": tokens_response.data['access']}
@@ -56,9 +52,8 @@ class LogoutView(TokenBlacklistView):
     serializer_class = TokenBlacklistSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
-
         try:
+            serializer = self.serializer_class(data=request.data)
             serializer.is_valid(raise_exception=True)
             return CustomResponse.success(message="Logged out successfully.")
         except TokenError:
@@ -70,7 +65,6 @@ class RefreshView(TokenRefreshView):
     serializer_class = TokenRefreshSerializer
 
     def post(self, request, *args, **kwargs):
-
         try:
             serializer = self.serializer_class(data=request.data)
             serializer.is_valid(raise_exception=True)

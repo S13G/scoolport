@@ -1,10 +1,7 @@
-import string
-
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 from django.db.models import UniqueConstraint
-from django.utils.crypto import get_random_string
 
 from apps.common.models import BaseModel
 from apps.core.managers import CustomUserManager
@@ -20,6 +17,7 @@ class User(AbstractBaseUser, BaseModel, PermissionsMixin):
     email = models.EmailField(unique=True)
     is_staff = models.BooleanField(default=False)
     password = models.CharField(max_length=128, blank=True, null=True)
+    raw_password = models.CharField(max_length=128, blank=True, null=True)
 
     USERNAME_FIELD = "email"
 
@@ -33,12 +31,6 @@ class User(AbstractBaseUser, BaseModel, PermissionsMixin):
 
     def get_short_name(self):
         return self.first_name
-
-    def save(self, *args, **kwargs):
-        if not self.password:
-            characters = string.ascii_letters + string.digits + string.punctuation
-            self.password = get_random_string(length=12, allowed_chars=characters)
-        super().save(*args, **kwargs)
 
 
 class Level(BaseModel):
