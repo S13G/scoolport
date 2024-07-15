@@ -31,5 +31,22 @@ class RegisterSerializer(sr.Serializer):
 
 
 class LoginSerializer(sr.Serializer):
-    email = sr.CharField(validators=[validate_email_address])
-    password = sr.CharField(write_only=True)
+    email = sr.CharField(validators=[validate_email_address], default="student1@gmail.com")
+    password = sr.CharField(write_only=True, default="Validpass#1234")
+
+
+class UserSerializer(sr.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'first_name', 'last_name', 'email')
+
+
+class StudentProfileSerializer(sr.Serializer):
+    user_info = UserSerializer(source="user")
+    profile_id = sr.UUIDField(source="id")
+    department = sr.CharField()
+    level = sr.CharField()
+    matric_no = sr.CharField()
+    date_of_birth = sr.DateField()
+    address = sr.CharField()
+    phone_number = sr.CharField()

@@ -55,7 +55,7 @@ class Department(BaseModel):
     name = models.CharField(max_length=200, unique=True)
 
     def __str__(self):
-        return f"{self.name} - {self.faculty.name}"
+        return f"{self.name}"
 
     class Meta:
         constraints = [

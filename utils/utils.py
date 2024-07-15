@@ -17,7 +17,7 @@ def generate_student_matric_no(model_class) -> str:
     prefix = f"{year}{month:02d}"
     last_student = model_class.objects.filter(matric_no__startswith=prefix).order_by('matric_no').last()
 
-    if not last_student or not last_student.student_id:
+    if not last_student or not last_student.id:
         new_id = f"{prefix}000001"
     else:
         last_id = int(last_student.matric_no[len(prefix):])

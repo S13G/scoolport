@@ -10,6 +10,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenBlacklistVi
 from apps.common.errors import ErrorCode
 from apps.common.exceptions import RequestError
 from apps.common.responses import CustomResponse
+from apps.core.docs.docs import *
 from apps.core.serializers import *
 
 User = get_user_model()
@@ -26,6 +27,7 @@ class LoginView(TokenObtainPairView):
     serializer_class = TokenObtainPairSerializer
     throttle_classes = [UserRateThrottle]
 
+    @login_docs()
     @transaction.atomic
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
@@ -44,13 +46,16 @@ class LoginView(TokenObtainPairView):
         tokens_response = super().post(request)
         tokens = {"refresh": tokens_response.data['refresh'], "access": tokens_response.data['access']}
 
-        response_data = {"tokens": tokens}
+        # serialized_data
+        profile = StudentProfileSerializer(user.profile).data
+        response_data = {"tokens": tokens, "profile": profile}
         return CustomResponse.success(message="Logged in successfully", data=response_data)
 
 
 class LogoutView(TokenBlacklistView):
     serializer_class = TokenBlacklistSerializer
 
+    @logout_docs()
     def post(self, request, *args, **kwargs):
         try:
             serializer = self.serializer_class(data=request.data)
@@ -64,6 +69,7 @@ class LogoutView(TokenBlacklistView):
 class RefreshView(TokenRefreshView):
     serializer_class = TokenRefreshSerializer
 
+    @refresh_docs()
     def post(self, request, *args, **kwargs):
         try:
             serializer = self.serializer_class(data=request.data)
