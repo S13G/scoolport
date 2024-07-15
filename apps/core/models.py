@@ -4,6 +4,7 @@ from django.db import models
 from django.db.models import UniqueConstraint
 
 from apps.common.models import BaseModel
+from apps.common.validators import validate_phone_number
 from apps.core.managers import CustomUserManager
 from utils.utils import generate_student_matric_no
 
@@ -53,6 +54,9 @@ class Department(BaseModel):
     faculty = models.ForeignKey(Faculty, on_delete=models.DO_NOTHING, related_name="departments")
     name = models.CharField(max_length=200, unique=True)
 
+    def __str__(self):
+        return f"{self.name} - {self.faculty.name}"
+
     class Meta:
         constraints = [
             UniqueConstraint(fields=['name', 'faculty'], name='unique_department')
@@ -60,13 +64,13 @@ class Department(BaseModel):
 
 
 class StudentProfile(BaseModel):
-    user = models.OneToOneField(User, on_delete=models.DO_NOTHING, related_name="profile")
-    department = models.ForeignKey(Department, on_delete=models.DO_NOTHING, related_name="students")
-    level = models.ForeignKey(Level, on_delete=models.DO_NOTHING, related_name="students")
-    matric_no = models.CharField(max_length=10, unique=True)
+    user = models.OneToOneField(User, null=True, on_delete=models.CASCADE, related_name="profile")
+    department = models.ForeignKey(Department, null=True, on_delete=models.DO_NOTHING, related_name="students")
+    level = models.ForeignKey(Level, null=True, on_delete=models.DO_NOTHING, related_name="students")
+    matric_no = models.CharField(max_length=12, unique=True)
     date_of_birth = models.DateField(null=True, blank=True)
     address = models.CharField(max_length=255, null=True, blank=True)
-    phone_number = models.CharField(max_length=15, null=True, blank=True)
+    phone_number = models.CharField(max_length=15, null=True, blank=True, validators=[validate_phone_number])
 
     def get_full_name(self):
         return self.user.get_full_name()
@@ -79,5 +83,5 @@ class StudentProfile(BaseModel):
 
     def save(self, *args, **kwargs):
         if not self.matric_no:
-            generate_student_matric_no(instance=self)
+            self.matric_no = generate_student_matric_no(model_class=self.__class__)
         super().save(*args, **kwargs)

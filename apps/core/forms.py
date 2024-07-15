@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.utils.crypto import get_random_string
 
 from apps.core.emails import send_account_email
+from apps.core.models import StudentProfile
 
 User = get_user_model()
 
@@ -36,9 +37,7 @@ class CustomUserCreationForm(forms.ModelForm):
                 password=raw_password,
                 template="account_details.html"
             )
-
-        if commit:
-            user.save()
+            StudentProfile.objects.create(user=user)
 
         return user
 
@@ -62,8 +61,5 @@ class CustomUserChangeForm(forms.ModelForm):
                 password=raw_password,
                 template="account_details.html"
             )
-
-        if commit:
-            user.save()
 
         return user

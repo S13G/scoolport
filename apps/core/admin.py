@@ -95,7 +95,7 @@ class UserAdmin(BaseUserAdmin):
 @admin.register(StudentProfile)
 class StudentProfileAdmin(admin.ModelAdmin):
     list_display = (
-        "user",
+        "full_name",
         "department",
         "level",
         "matric_no",
@@ -108,6 +108,10 @@ class StudentProfileAdmin(admin.ModelAdmin):
         "user__last_name",
         "level__name",
     )
+
+    @admin.display(description="Full Name")
+    def full_name(self, obj):
+        return obj.get_full_name()
 
 
 admin.site.register(User, UserAdmin)
