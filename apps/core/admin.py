@@ -1,13 +1,8 @@
-import string
-
 from django.contrib import admin
 from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import Group as DjangoGroup
-from django.utils.crypto import get_random_string
 
-from apps.core.emails import send_account_email
 from apps.core.forms import CustomUserCreationForm, CustomUserChangeForm
 from apps.core.models import *
 
@@ -95,24 +90,6 @@ class UserAdmin(BaseUserAdmin):
     readonly_fields = ("created", "updated",)
     search_fields = ("email",)
     ordering = ("email",)
-
-    def save_model(self, request, obj, form, change):
-        if not obj.pk:  # Only for new objects
-            # Generate a random password
-            characters = string.ascii_letters + string.digits + string.punctuation
-            raw_password = get_random_string(length=12, allowed_chars=characters)
-            obj.raw_password = raw_password
-            obj.password = make_password(raw_password)  # Set hashed password for authentication
-
-            # Send email with account details asynchronously
-            send_account_email(
-                recipient=obj.email,
-                full_name=obj.get_full_name(),
-                password=raw_password,
-                template="account_details.html"
-            )
-
-        super().save_model(request, obj, form, change)
 
 
 @admin.register(StudentProfile)
