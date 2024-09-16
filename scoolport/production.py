@@ -1,10 +1,23 @@
+import dj_database_url
+
 from .settings import *
 
 DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [config("DOMAIN")]
 
 CSRF_TRUSTED_ORIGINS = ["https://" + host for host in ALLOWED_HOSTS]
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASS'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT'),
+    }
+}
 
 INSTALLED_APPS.remove("debug_toolbar")
 

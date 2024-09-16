@@ -2,11 +2,7 @@ FROM python:3.10-slim
 
 # Install PostgreSQL dependencies
 # Install build dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    libpq-dev gcc libc-dev libffi-dev supervisor && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache postgresql-dev gcc musl-dev libffi-dev
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
