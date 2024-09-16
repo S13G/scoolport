@@ -42,6 +42,7 @@ class CourseAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "department",
+        "semester",
         "course_level",
         "course_code",
         "unit",
@@ -49,13 +50,26 @@ class CourseAdmin(admin.ModelAdmin):
     list_per_page = 20
     search_fields = ("name", "department__name", "course_level__name",)
 
+    @admin.display(ordering="department", description="Department")
+    def department(self, obj):
+        return obj.department.name
+
+    @admin.display(ordering="Level", description="Course Level")
+    def course_level(self, obj):
+        return obj.course_level.name
+
+    @admin.display(ordering="semester", description="Semester")
+    def semester(self, obj):
+        return obj.semester.name
+
 
 @admin.register(CourseRegistration)
 class CourseRegistrationAdmin(admin.ModelAdmin):
     list_display = (
         "student",
-        "semester",
         "department",
+        "course_name",
+        "registered_status",
     )
     list_per_page = 20
     search_fields = ("student__user__email", "course__name",)
@@ -63,6 +77,10 @@ class CourseRegistrationAdmin(admin.ModelAdmin):
     @admin.display(ordering="student__department", description="Department")
     def department(self, obj):
         return obj.student.get_department_name()
+
+    @admin.display(ordering="Course name", description="Course Level")
+    def course_name(self, obj):
+        return obj.course.name
 
 
 admin.site.register(Result)
