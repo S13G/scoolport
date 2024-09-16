@@ -44,8 +44,8 @@ class CourseRegistration(BaseModel):
     course = models.ForeignKey(Course, related_name="registrations", on_delete=models.DO_NOTHING)
     registered_status = models.BooleanField(default=False)
 
-    class Meta:
-        unique_together = ('student', 'course')
+    # class Meta:
+    #     unique_together = ('student', 'course')
 
     def __str__(self):
         return f"{self.student.get_full_name()} - {self.student.get_department_name()} {self.course.name}"
