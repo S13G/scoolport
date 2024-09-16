@@ -32,8 +32,8 @@ COPY . /scoolport
 RUN python manage.py migrate --settings=$DJANGO_SETTINGS_MODULE && \
     python manage.py collectstatic --noinput --settings=$DJANGO_SETTINGS_MODULE
 
-# Expose the port the app runs on
-EXPOSE 8000
-
 # Command to run the server with auto-restart for code changes
-CMD ["sh", "-c", "watchmedo auto-restart --directory=/scoolport/ --pattern=*.py --recursive -- python manage.py runserver 0.0.0.0:$PORT --settings=$DJANGO_SETTINGS_MODULE"]
+CMD ["sh", "-c", "python manage.py migrate --settings=$DJANGO_SETTINGS_MODULE && \
+    python manage.py collectstatic --noinput --settings=$DJANGO_SETTINGS_MODULE && \
+    python manage.py createsu --settings=$DJANGO_SETTINGS_MODULE && \
+    watchmedo auto-restart --directory=/scoolport/ --pattern=*.py --recursive -- python manage.py runserver 0.0.0.0:$PORT --settings=$DJANGO_SETTINGS_MODULE"]
