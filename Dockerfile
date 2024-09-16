@@ -27,11 +27,6 @@ RUN pip install --no-cache-dir watchdog
 # Copy the Django project into the image
 COPY . /scoolport
 
-# Run migrations, collectstatic, and createsuperuser
-# Note: `createsuperuser` usually needs to be handled manually or in a different way
-RUN python manage.py migrate --settings=$DJANGO_SETTINGS_MODULE && \
-    python manage.py collectstatic --noinput --settings=$DJANGO_SETTINGS_MODULE
-
 # Command to run the server with auto-restart for code changes
 CMD ["sh", "-c", "python manage.py migrate --settings=$DJANGO_SETTINGS_MODULE && \
     python manage.py collectstatic --noinput --settings=$DJANGO_SETTINGS_MODULE && \
