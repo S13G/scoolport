@@ -49,9 +49,11 @@ class UnregisterCourseSerializer(serializers.Serializer):
     def validate(self, attrs):
         course_id = attrs.get('course_id', None)
 
+        # Check if course exists
         if not Course.objects.filter(id=course_id).exists():
             raise serializers.ValidationError("Course not found.")
 
+        # Check if course is already registered
         if not CourseRegistration.objects.filter(student=self.context['request'].user.profile,
                                                  course__id=course_id).exists():
             raise serializers.ValidationError("Course not registered.")
