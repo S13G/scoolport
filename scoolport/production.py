@@ -2,7 +2,6 @@ from .settings import *
 
 DEBUG = False
 
-DEBUG_PROPAGATE_EXCEPTIONS = True
 
 ALLOWED_HOSTS = ["scoolport.up.railway.app"]
 
