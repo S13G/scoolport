@@ -27,9 +27,6 @@ RUN pip install --no-cache-dir watchdog
 # Copy the Django project into the image
 COPY . /scoolport
 
-# Set environment variables
-EXPOSE $PORT
-
 # Command to run the server with auto-restart for code changes
 CMD ["sh", "-c", "python manage.py migrate --settings=$DJANGO_SETTINGS_MODULE && \
     python manage.py collectstatic --noinput --settings=$DJANGO_SETTINGS_MODULE && \

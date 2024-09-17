@@ -1,7 +1,6 @@
 from .settings import *
 
-DEBUG = False
-
+DEBUG = True
 
 ALLOWED_HOSTS = ["scoolport.up.railway.app"]
 
