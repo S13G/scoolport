@@ -2,6 +2,8 @@ from .settings import *
 
 DEBUG = False
 
+DEBUG_PROPAGATE_EXCEPTIONS = True
+
 ALLOWED_HOSTS = ["scoolport.up.railway.app"]
 
 CSRF_TRUSTED_ORIGINS = ["https://" + host for host in ALLOWED_HOSTS]
