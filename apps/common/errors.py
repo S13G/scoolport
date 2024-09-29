@@ -1,6 +1,6 @@
 class ErrorCode:
     INVALID_PAGE = "invalid_page"
-    INVALID_OWNER = 'invalid_owner'
+    INVALID_OWNER = "invalid_owner"
     UNAUTHORIZED_USER = "unauthorized_user"
     NETWORK_FAILURE = "network_failure"
     SERVER_ERROR = "server_error"

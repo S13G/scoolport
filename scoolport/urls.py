@@ -14,9 +14,9 @@ urlpatterns_v1 = [
 urlpatterns = [
     path("schema/", SpectacularAPIView.as_view(), name="schema"),
     path("", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
     path("api/v1/", include(urlpatterns_v1)),
-    path('__debug__/', include('debug_toolbar.urls')),
+    path("__debug__/", include("debug_toolbar.urls")),
 ]
 
 # Serve media files in development

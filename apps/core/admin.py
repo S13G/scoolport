@@ -30,11 +30,8 @@ class UserAdmin(BaseUserAdmin):
         "last_name",
         "email",
         "is_staff",
-
     )
-    list_display_links = (
-        "email",
-    )
+    list_display_links = ("email",)
     list_filter = (
         "email",
         "first_name",
@@ -56,13 +53,7 @@ class UserAdmin(BaseUserAdmin):
         ),
         (
             "Permissions",
-            {
-                "fields": (
-                    "is_staff",
-                    "groups",
-                    "user_permissions"
-                )
-            },
+            {"fields": ("is_staff", "groups", "user_permissions")},
         ),
         (
             "Important Dates",
@@ -90,7 +81,10 @@ class UserAdmin(BaseUserAdmin):
             },
         ),
     )
-    readonly_fields = ("created", "updated",)
+    readonly_fields = (
+        "created",
+        "updated",
+    )
     search_fields = ("email",)
     ordering = ("email",)
 
@@ -124,18 +118,24 @@ class FacultyAdmin(admin.ModelAdmin):
         "departments",
     )
     list_per_page = 20
-    search_fields = (
-        "name",
-    )
+    search_fields = ("name",)
 
     @admin.display(ordering="departments", description="Departments")
     def departments(self, faculty):
-        url = reverse("admin:core_department_changelist") + "?faculty=" + str(faculty.id)
+        url = (
+            reverse("admin:core_department_changelist") + "?faculty=" + str(faculty.id)
+        )
 
-        return format_html('<a href="{}">{} Departments</a>', url, faculty.departments_count)
+        return format_html(
+            '<a href="{}">{} Departments</a>', url, faculty.departments_count
+        )
 
     def get_queryset(self, request):
-        return super().get_queryset(request).annotate(departments_count=Count("departments"))
+        return (
+            super()
+            .get_queryset(request)
+            .annotate(departments_count=Count("departments"))
+        )
 
 
 @admin.register(Department)
@@ -150,9 +150,15 @@ class DepartmentAdmin(admin.ModelAdmin):
 
     @admin.display(ordering="students", description="Students")
     def students(self, department):
-        url = reverse("admin:core_studentprofile_changelist") + "?department=" + str(department.id)
+        url = (
+            reverse("admin:core_studentprofile_changelist")
+            + "?department="
+            + str(department.id)
+        )
 
-        return format_html('<a href="{}">{} Students</a>', url, department.students_count)
+        return format_html(
+            '<a href="{}">{} Students</a>', url, department.students_count
+        )
 
     def get_queryset(self, request):
         return super().get_queryset(request).annotate(students_count=Count("students"))
@@ -160,9 +166,7 @@ class DepartmentAdmin(admin.ModelAdmin):
 
 @admin.register(Level)
 class LevelAdmin(admin.ModelAdmin):
-    list_display = (
-        "name",
-    )
+    list_display = ("name",)
     list_per_page = 20
 
     def has_add_permission(self, request):

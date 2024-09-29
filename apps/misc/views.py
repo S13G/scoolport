@@ -8,6 +8,7 @@ from apps.misc.models import FAQ
 
 # Create your views here.
 
+
 class RetrieveFAQs(APIView):
     permission_classes = [IsAuthenticated]
     all_faqs = FAQ.objects.values("id", "question", "answer")

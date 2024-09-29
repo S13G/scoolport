@@ -8,13 +8,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0003_alter_studentprofile_department_and_more'),
+        ("core", "0003_alter_studentprofile_department_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='studentprofile',
-            name='user',
-            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='profile', to=settings.AUTH_USER_MODEL),
+            model_name="studentprofile",
+            name="user",
+            field=models.OneToOneField(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="profile",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

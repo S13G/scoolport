@@ -8,23 +8,27 @@ from apps.portal.models import *
 
 # Register your models here.
 
+
 @admin.register(Session)
 class SessionAdmin(admin.ModelAdmin):
-    list_display = (
-        "name",
-        "semesters"
-    )
+    list_display = ("name", "semesters")
     list_per_page = 20
     search_fields = ("name",)
 
     @admin.display(ordering="semesters", description="Semesters")
     def semesters(self, session):
-        url = reverse("admin:portal_semester_changelist") + "?session=" + str(session.id)
+        url = (
+            reverse("admin:portal_semester_changelist") + "?session=" + str(session.id)
+        )
 
-        return format_html('<a href="{}">{} Semesters</a>', url, session.semesters_count)
+        return format_html(
+            '<a href="{}">{} Semesters</a>', url, session.semesters_count
+        )
 
     def get_queryset(self, request):
-        return super().get_queryset(request).annotate(semesters_count=Count("semesters"))
+        return (
+            super().get_queryset(request).annotate(semesters_count=Count("semesters"))
+        )
 
 
 @admin.register(Semester)
@@ -34,7 +38,10 @@ class SemesterAdmin(admin.ModelAdmin):
         "name",
     )
     list_per_page = 20
-    search_fields = ("session__name", "name",)
+    search_fields = (
+        "session__name",
+        "name",
+    )
 
 
 @admin.register(Course)
@@ -48,7 +55,11 @@ class CourseAdmin(admin.ModelAdmin):
         "unit",
     )
     list_per_page = 20
-    search_fields = ("name", "department__name", "course_level__name",)
+    search_fields = (
+        "name",
+        "department__name",
+        "course_level__name",
+    )
 
     @admin.display(ordering="department", description="Department")
     def department(self, obj):
@@ -66,13 +77,20 @@ class CourseAdmin(admin.ModelAdmin):
 @admin.register(CourseRegistration)
 class CourseRegistrationAdmin(admin.ModelAdmin):
     list_display = (
-        "student",
+        "student_name",
         "department",
         "course_name",
         "registered_status",
     )
     list_per_page = 20
-    search_fields = ("student__user__email", "course__name",)
+    search_fields = (
+        "student__user__email",
+        "course__name",
+    )
+
+    @admin.display(ordering="student__user__email", description="Student name")
+    def student_name(self, obj):
+        return obj.student.get_full_name()
 
     @admin.display(ordering="student__department", description="Department")
     def department(self, obj):

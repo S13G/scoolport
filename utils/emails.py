@@ -15,7 +15,13 @@ class EmailThread(threading.Thread):
         self.email.send()
 
 
-def send_email(subject: str, recipients: list, message: str = None, context: dict = None, template: str = None) -> None:
+def send_email(
+    subject: str,
+    recipients: list,
+    message: str = None,
+    context: dict = None,
+    template: str = None,
+) -> None:
     if context is None:
         context = {}
 
@@ -23,7 +29,7 @@ def send_email(subject: str, recipients: list, message: str = None, context: dic
         subject=subject,
         body=message or strip_tags(render_to_string(template, context)),
         from_email=settings.EMAIL_HOST_USER,
-        to=recipients
+        to=recipients,
     )
 
     if template:

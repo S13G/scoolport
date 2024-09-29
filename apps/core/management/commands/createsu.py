@@ -6,16 +6,16 @@ User = get_user_model()
 
 
 class Command(BaseCommand):
-    help = 'Creates a superuser.'
+    help = "Creates a superuser."
 
     def handle(self, *args, **options):
-        if not User.objects.filter(email=config('ADMIN_EMAIL')).exists():
+        if not User.objects.filter(email=config("ADMIN_EMAIL")).exists():
             User.objects.create_superuser(
-                first_name=config('ADMIN_FIRST_NAME'),
-                last_name=config('ADMIN_LAST_NAME'),
-                email=config('ADMIN_EMAIL'),
-                password=config('ADMIN_PASSWORD')
+                first_name=config("ADMIN_FIRST_NAME"),
+                last_name=config("ADMIN_LAST_NAME"),
+                email=config("ADMIN_EMAIL"),
+                password=config("ADMIN_PASSWORD"),
             )
-            self.stdout.write(self.style.SUCCESS('Superuser has been created.'))
+            self.stdout.write(self.style.SUCCESS("Superuser has been created."))
         else:
             self.stderr.write(self.style.WARNING("Superuser already exists."))

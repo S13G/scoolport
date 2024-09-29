@@ -1,6 +1,11 @@
 from http import HTTPStatus
 
-from rest_framework.exceptions import AuthenticationFailed, ValidationError, APIException, PermissionDenied
+from rest_framework.exceptions import (
+    AuthenticationFailed,
+    ValidationError,
+    APIException,
+    PermissionDenied,
+)
 
 from apps.common.errors import ErrorCode
 from apps.common.responses import CustomResponse
@@ -9,7 +14,9 @@ from apps.common.responses import CustomResponse
 class RequestError(APIException):
     default_detail = "An error occurred"
 
-    def __init__(self, err_code: str, err_msg: str, status_code: int = 400, data: dict = None):
+    def __init__(
+        self, err_code: str, err_msg: str, status_code: int = 400, data: dict = None
+    ):
         self.status_code = HTTPStatus(status_code)
         self.err_code = err_code
         self.err_msg = err_msg
@@ -73,7 +80,7 @@ def custom_exception_handler(exc, context):
         elif isinstance(exc, PermissionDenied):
             return handle_permission_error(exc)
         else:
-            status_code = 500 if not hasattr(exc, 'status_code') else exc.status_code
+            status_code = 500 if not hasattr(exc, "status_code") else exc.status_code
             return CustomResponse.error(
                 message="Something went wrong!",
                 status_code=status_code,

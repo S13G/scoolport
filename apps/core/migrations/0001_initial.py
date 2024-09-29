@@ -13,105 +13,214 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('auth', '0012_alter_user_first_name_max_length'),
+        ("auth", "0012_alter_user_first_name_max_length"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Faculty',
+            name="Faculty",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
-                ('created', models.DateTimeField(auto_now_add=True, db_index=True)),
-                ('updated', models.DateTimeField(auto_now=True, null=True)),
-                ('name', models.CharField(max_length=200, unique=True)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                        unique=True,
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True, db_index=True)),
+                ("updated", models.DateTimeField(auto_now=True, null=True)),
+                ("name", models.CharField(max_length=200, unique=True)),
             ],
             options={
-                'verbose_name_plural': 'Faculties',
+                "verbose_name_plural": "Faculties",
             },
         ),
         migrations.CreateModel(
-            name='Level',
+            name="Level",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
-                ('created', models.DateTimeField(auto_now_add=True, db_index=True)),
-                ('updated', models.DateTimeField(auto_now=True, null=True)),
-                ('name', models.CharField(max_length=100)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                        unique=True,
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True, db_index=True)),
+                ("updated", models.DateTimeField(auto_now=True, null=True)),
+                ("name", models.CharField(max_length=100)),
             ],
             options={
-                'ordering': ('-created',),
-                'abstract': False,
+                "ordering": ("-created",),
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='Group',
-            fields=[
-            ],
+            name="Group",
+            fields=[],
             options={
-                'verbose_name': 'group',
-                'verbose_name_plural': 'groups',
-                'proxy': True,
-                'indexes': [],
-                'constraints': [],
+                "verbose_name": "group",
+                "verbose_name_plural": "groups",
+                "proxy": True,
+                "indexes": [],
+                "constraints": [],
             },
-            bases=('auth.group',),
+            bases=("auth.group",),
             managers=[
-                ('objects', django.contrib.auth.models.GroupManager()),
+                ("objects", django.contrib.auth.models.GroupManager()),
             ],
         ),
         migrations.CreateModel(
-            name='User',
+            name="User",
             fields=[
-                ('last_login', models.DateTimeField(blank=True, null=True, verbose_name='last login')),
-                ('is_superuser', models.BooleanField(default=False, help_text='Designates that this user has all permissions without explicitly assigning them.', verbose_name='superuser status')),
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
-                ('created', models.DateTimeField(auto_now_add=True, db_index=True)),
-                ('updated', models.DateTimeField(auto_now=True, null=True)),
-                ('first_name', models.CharField(max_length=50)),
-                ('last_name', models.CharField(max_length=50)),
-                ('email', models.EmailField(max_length=254, unique=True)),
-                ('is_staff', models.BooleanField(default=False)),
-                ('password', models.CharField(blank=True, max_length=128, null=True)),
-                ('groups', models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='user_set', related_query_name='user', to='auth.group', verbose_name='groups')),
-                ('user_permissions', models.ManyToManyField(blank=True, help_text='Specific permissions for this user.', related_name='user_set', related_query_name='user', to='auth.permission', verbose_name='user permissions')),
+                (
+                    "last_login",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="last login"
+                    ),
+                ),
+                (
+                    "is_superuser",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Designates that this user has all permissions without explicitly assigning them.",
+                        verbose_name="superuser status",
+                    ),
+                ),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                        unique=True,
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True, db_index=True)),
+                ("updated", models.DateTimeField(auto_now=True, null=True)),
+                ("first_name", models.CharField(max_length=50)),
+                ("last_name", models.CharField(max_length=50)),
+                ("email", models.EmailField(max_length=254, unique=True)),
+                ("is_staff", models.BooleanField(default=False)),
+                ("password", models.CharField(blank=True, max_length=128, null=True)),
+                (
+                    "groups",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="The groups this user belongs to. A user will get all permissions granted to each of their groups.",
+                        related_name="user_set",
+                        related_query_name="user",
+                        to="auth.group",
+                        verbose_name="groups",
+                    ),
+                ),
+                (
+                    "user_permissions",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="Specific permissions for this user.",
+                        related_name="user_set",
+                        related_query_name="user",
+                        to="auth.permission",
+                        verbose_name="user permissions",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
             managers=[
-                ('objects', apps.core.managers.CustomUserManager()),
+                ("objects", apps.core.managers.CustomUserManager()),
             ],
         ),
         migrations.CreateModel(
-            name='Department',
+            name="Department",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
-                ('created', models.DateTimeField(auto_now_add=True, db_index=True)),
-                ('updated', models.DateTimeField(auto_now=True, null=True)),
-                ('name', models.CharField(max_length=200, unique=True)),
-                ('faculty', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='departments', to='core.faculty')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                        unique=True,
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True, db_index=True)),
+                ("updated", models.DateTimeField(auto_now=True, null=True)),
+                ("name", models.CharField(max_length=200, unique=True)),
+                (
+                    "faculty",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="departments",
+                        to="core.faculty",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='StudentProfile',
+            name="StudentProfile",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
-                ('created', models.DateTimeField(auto_now_add=True, db_index=True)),
-                ('updated', models.DateTimeField(auto_now=True, null=True)),
-                ('matric_no', models.CharField(max_length=10, unique=True)),
-                ('date_of_birth', models.DateField(blank=True, null=True)),
-                ('address', models.CharField(blank=True, max_length=255, null=True)),
-                ('phone_number', models.CharField(blank=True, max_length=15, null=True)),
-                ('department', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='students', to='core.department')),
-                ('level', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='students', to='core.level')),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.DO_NOTHING, related_name='profile', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                        unique=True,
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True, db_index=True)),
+                ("updated", models.DateTimeField(auto_now=True, null=True)),
+                ("matric_no", models.CharField(max_length=10, unique=True)),
+                ("date_of_birth", models.DateField(blank=True, null=True)),
+                ("address", models.CharField(blank=True, max_length=255, null=True)),
+                (
+                    "phone_number",
+                    models.CharField(blank=True, max_length=15, null=True),
+                ),
+                (
+                    "department",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="students",
+                        to="core.department",
+                    ),
+                ),
+                (
+                    "level",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="students",
+                        to="core.level",
+                    ),
+                ),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="profile",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'ordering': ('-created',),
-                'abstract': False,
+                "ordering": ("-created",),
+                "abstract": False,
             },
         ),
         migrations.AddConstraint(
-            model_name='department',
-            constraint=models.UniqueConstraint(fields=('name', 'faculty'), name='unique_department'),
+            model_name="department",
+            constraint=models.UniqueConstraint(
+                fields=("name", "faculty"), name="unique_department"
+            ),
         ),
     ]

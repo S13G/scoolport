@@ -10,89 +10,206 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('core', '0005_alter_studentprofile_matric_no_and_more'),
+        ("core", "0005_alter_studentprofile_matric_no_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Semester',
+            name="Semester",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
-                ('created', models.DateTimeField(auto_now_add=True, db_index=True)),
-                ('updated', models.DateTimeField(auto_now=True, null=True)),
-                ('name', models.CharField(choices=[('Rain', 'Rain'), ('Harmattan', 'Harmattan')], max_length=9, null=True)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                        unique=True,
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True, db_index=True)),
+                ("updated", models.DateTimeField(auto_now=True, null=True)),
+                (
+                    "name",
+                    models.CharField(
+                        choices=[("Rain", "Rain"), ("Harmattan", "Harmattan")],
+                        max_length=9,
+                        null=True,
+                    ),
+                ),
             ],
             options={
-                'ordering': ('-created',),
-                'abstract': False,
+                "ordering": ("-created",),
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='Session',
+            name="Session",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
-                ('created', models.DateTimeField(auto_now_add=True, db_index=True)),
-                ('updated', models.DateTimeField(auto_now=True, null=True)),
-                ('name', models.CharField(max_length=200, unique=True)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                        unique=True,
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True, db_index=True)),
+                ("updated", models.DateTimeField(auto_now=True, null=True)),
+                ("name", models.CharField(max_length=200, unique=True)),
             ],
             options={
-                'ordering': ('-created',),
-                'abstract': False,
+                "ordering": ("-created",),
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='Course',
+            name="Course",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
-                ('created', models.DateTimeField(auto_now_add=True, db_index=True)),
-                ('updated', models.DateTimeField(auto_now=True, null=True)),
-                ('name', models.CharField(max_length=200, unique=True)),
-                ('course_code', models.CharField(max_length=10, unique=True)),
-                ('description', models.CharField(blank=True, max_length=255)),
-                ('unit', models.PositiveIntegerField(default=1)),
-                ('course_level', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='courses', to='core.level')),
-                ('department', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='courses', to='core.department')),
-                ('semester', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='registrations', to='portal.semester')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                        unique=True,
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True, db_index=True)),
+                ("updated", models.DateTimeField(auto_now=True, null=True)),
+                ("name", models.CharField(max_length=200, unique=True)),
+                ("course_code", models.CharField(max_length=10, unique=True)),
+                ("description", models.CharField(blank=True, max_length=255)),
+                ("unit", models.PositiveIntegerField(default=1)),
+                (
+                    "course_level",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="courses",
+                        to="core.level",
+                    ),
+                ),
+                (
+                    "department",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="courses",
+                        to="core.department",
+                    ),
+                ),
+                (
+                    "semester",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="registrations",
+                        to="portal.semester",
+                    ),
+                ),
             ],
             options={
-                'ordering': ('-created',),
-                'abstract': False,
+                "ordering": ("-created",),
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='CourseRegistration',
+            name="CourseRegistration",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
-                ('created', models.DateTimeField(auto_now_add=True, db_index=True)),
-                ('updated', models.DateTimeField(auto_now=True, null=True)),
-                ('registered_status', models.BooleanField(default=False)),
-                ('course', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='registrations', to='portal.course')),
-                ('student', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='registrations', to='core.studentprofile')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                        unique=True,
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True, db_index=True)),
+                ("updated", models.DateTimeField(auto_now=True, null=True)),
+                ("registered_status", models.BooleanField(default=False)),
+                (
+                    "course",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="registrations",
+                        to="portal.course",
+                    ),
+                ),
+                (
+                    "student",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="registrations",
+                        to="core.studentprofile",
+                    ),
+                ),
             ],
             options={
-                'ordering': ('-created',),
-                'abstract': False,
+                "ordering": ("-created",),
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='Result',
+            name="Result",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
-                ('created', models.DateTimeField(auto_now_add=True, db_index=True)),
-                ('updated', models.DateTimeField(auto_now=True, null=True)),
-                ('grade', models.CharField(choices=[('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D'), ('E', 'E'), ('F', 'F')], max_length=1)),
-                ('gpa', models.DecimalField(decimal_places=2, max_digits=4)),
-                ('cgpa', models.DecimalField(blank=True, decimal_places=2, max_digits=4, null=True)),
-                ('registration', models.OneToOneField(on_delete=django.db.models.deletion.DO_NOTHING, related_name='result', to='portal.courseregistration')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                        unique=True,
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True, db_index=True)),
+                ("updated", models.DateTimeField(auto_now=True, null=True)),
+                (
+                    "grade",
+                    models.CharField(
+                        choices=[
+                            ("A", "A"),
+                            ("B", "B"),
+                            ("C", "C"),
+                            ("D", "D"),
+                            ("E", "E"),
+                            ("F", "F"),
+                        ],
+                        max_length=1,
+                    ),
+                ),
+                ("gpa", models.DecimalField(decimal_places=2, max_digits=4)),
+                (
+                    "cgpa",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=4, null=True
+                    ),
+                ),
+                (
+                    "registration",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="result",
+                        to="portal.courseregistration",
+                    ),
+                ),
             ],
             options={
-                'ordering': ('-created',),
-                'abstract': False,
+                "ordering": ("-created",),
+                "abstract": False,
             },
         ),
         migrations.AddField(
-            model_name='semester',
-            name='session',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='semesters', to='portal.session'),
+            model_name="semester",
+            name="session",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                related_name="semesters",
+                to="portal.session",
+            ),
         ),
     ]

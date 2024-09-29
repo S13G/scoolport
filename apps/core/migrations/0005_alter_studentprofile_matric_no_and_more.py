@@ -9,23 +9,33 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0004_alter_studentprofile_user'),
+        ("core", "0004_alter_studentprofile_user"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='studentprofile',
-            name='matric_no',
+            model_name="studentprofile",
+            name="matric_no",
             field=models.CharField(max_length=12, unique=True),
         ),
         migrations.AlterField(
-            model_name='studentprofile',
-            name='phone_number',
-            field=models.CharField(blank=True, max_length=15, null=True, validators=[apps.common.validators.validate_phone_number]),
+            model_name="studentprofile",
+            name="phone_number",
+            field=models.CharField(
+                blank=True,
+                max_length=15,
+                null=True,
+                validators=[apps.common.validators.validate_phone_number],
+            ),
         ),
         migrations.AlterField(
-            model_name='studentprofile',
-            name='user',
-            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='profile', to=settings.AUTH_USER_MODEL),
+            model_name="studentprofile",
+            name="user",
+            field=models.OneToOneField(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="profile",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

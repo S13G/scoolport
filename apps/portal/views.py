@@ -23,7 +23,7 @@ class RetrieveSessionView(APIView):
 
 @retrieve_semester_docs()
 class RetrieveSemestersView(APIView):
-    all_semesters = Semester.objects.select_related('session').values("id", "name")
+    all_semesters = Semester.objects.select_related("session").values("id", "name")
 
     def get(self, request, *args, **kwargs):
         session_id = self.kwargs.get("session_id")
@@ -80,11 +80,13 @@ class RetrieveCoursesToRegisterView(APIView):
                     "name": course.name,
                     "course_code": course.course_code,
                     "unit": course.unit,
-                    "is_registered": course.course_registered_by_student(user_profile)
+                    "is_registered": course.course_registered_by_student(user_profile),
                 }
             )
 
-        return CustomResponse.success(message="Retrieved successfully", data=course_list)
+        return CustomResponse.success(
+            message="Retrieved successfully", data=course_list
+        )
 
 
 class RegisterCoursesView(APIView):
@@ -95,7 +97,12 @@ class RegisterCoursesView(APIView):
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         student_profile = request.user.profile
-        serializer = self.serializer_class(data=request.data, context={'request': request})
+        latest_semester = Semester.objects.latest()
+
+        serializer = self.serializer_class(
+            data=request.data,
+            context={"request": request, "student_profile": student_profile},
+        )
         serializer.is_valid(raise_exception=True)
 
         courses = serializer.validated_data.get("valid_courses")
@@ -104,7 +111,13 @@ class RegisterCoursesView(APIView):
         course_registrations = []
         for course in courses:
             course_registrations.append(
-                CourseRegistration(student=student_profile, course=course, registered_status=True)
+                CourseRegistration(
+                    student=student_profile,
+                    course=course,
+                    registered_status=True,
+                    semester=latest_semester,
+                    level=student_profile.level,
+                )
             )
 
         # Bulk create CourseRegistration objects
@@ -122,28 +135,41 @@ class RetrieveRegisteredCoursesView(APIView):
     def get(request, *args, **kwargs):
         student_profile = request.user.profile
 
+        latest_semester = Semester.objects.latest()
+
         # Retrieve registered courses for the student
-        course_registrations = (
-            CourseRegistration.objects.select_related("student", "course")
-            .filter(student=student_profile, registered_status=True)
+        course_registrations = CourseRegistration.objects.select_related(
+            "student", "course", "semester", "level"
+        ).filter(
+            student=student_profile,
+            registered_status=True,
+            semester=latest_semester,
+            level=student_profile.level,
         )
 
         # Aggregate course units
         total_units = (
-                course_registrations.values('course__unit')
-                .aggregate(total_units=Sum('course__unit'))[
-                    'total_units'] or 0
+            course_registrations.values("course__unit").aggregate(
+                total_units=Sum("course__unit")
+            )["total_units"]
+            or 0
         )
 
         # Retrieve course details
-        courses = course_registrations.values("id", "course__id", "course__name", "course__unit", "registered_status")
+        courses = course_registrations.values(
+            "id",
+            "course__id",
+            "course__name",
+            "course__course_code",
+            "course__unit",
+            "registered_status",
+        )
 
-        response_data = {
-            "courses": list(courses),
-            "total_units": total_units
-        }
+        response_data = {"courses": list(courses), "total_units": total_units}
 
-        return CustomResponse.success(message="Retrieved successfully", data=response_data)
+        return CustomResponse.success(
+            message="Retrieved successfully", data=response_data
+        )
 
 
 class UnregisterCourseView(APIView):
@@ -154,14 +180,82 @@ class UnregisterCourseView(APIView):
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         student_profile = request.user.profile
-        serializer = self.serializer_class(data=request.data, context={'request': request})
+        latest_semester = Semester.objects.latest()
+        serializer = self.serializer_class(
+            data=request.data, context={"request": request}
+        )
         serializer.is_valid(raise_exception=True)
 
         course_id = serializer.validated_data.get("course_id")
 
-        course_registration = CourseRegistration.objects.select_related("student", "course").get(
-            student=student_profile, course__id=course_id)
+        course_registration = CourseRegistration.objects.select_related(
+            "student", "course", "semester", "level"
+        ).get(
+            student=student_profile,
+            course__id=course_id,
+            semester=latest_semester,
+            level=student_profile.level,
+        )
         course_registration.registered_status = False
         course_registration.save()
 
         return CustomResponse.success("Course unregistered successfully")
+
+
+class RetrieveAllSemestersRegisteredCoursesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    @retrieve_all_semesters_registered_courses_docs()
+    def get(request, *args, **kwargs):
+        student_profile = request.user.profile
+        all_semesters = Semester.objects.order_by("created")
+
+        registered_courses_by_semester = {}
+
+        # Retrieve registered courses for all semesters
+        for semester in all_semesters:
+            course_registrations = CourseRegistration.objects.select_related(
+                "student", "course", "semester"
+            ).filter(
+                student=student_profile,
+                registered_status=True,
+                semester=semester,
+                level=student_profile.level,
+            )
+
+            # Aggregate course units
+            total_units = (
+                course_registrations.values("course__unit").aggregate(
+                    total_units=Sum("course__unit")
+                )["total_units"]
+                or 0
+            )
+
+            # Retrieve course details
+            courses = list(
+                course_registrations.values(
+                    "id",
+                    "course__id",
+                    "course__name",
+                    "course__unit",
+                    "registered_status",
+                )
+            )
+
+            # Add semester data to the dictionary
+            registered_courses_by_semester[
+                f"{semester.session.name} {student_profile.level}{semester.name}"
+            ] = {
+                "courses": courses,
+                "total_units": total_units,
+            }
+
+        # Reverse the order of the dictionary
+        registered_courses_by_semester = dict(
+            reversed(list(registered_courses_by_semester.items()))
+        )
+
+        return CustomResponse.success(
+            message="Retrieved successfully", data=registered_courses_by_semester
+        )

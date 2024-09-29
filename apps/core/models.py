@@ -15,11 +15,12 @@ from utils.utils import generate_student_matric_no
 class User(AbstractBaseUser, BaseModel, PermissionsMixin):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True, blank=True, null=True)
     is_staff = models.BooleanField(default=False)
     raw_password = models.CharField(max_length=128, blank=True, null=True)
 
     USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
 
@@ -51,7 +52,9 @@ class Faculty(BaseModel):
 
 
 class Department(BaseModel):
-    faculty = models.ForeignKey(Faculty, on_delete=models.DO_NOTHING, related_name="departments")
+    faculty = models.ForeignKey(
+        Faculty, on_delete=models.DO_NOTHING, related_name="departments"
+    )
     name = models.CharField(max_length=200, unique=True)
 
     def __str__(self):
@@ -59,18 +62,26 @@ class Department(BaseModel):
 
     class Meta:
         constraints = [
-            UniqueConstraint(fields=['name', 'faculty'], name='unique_department')
+            UniqueConstraint(fields=["name", "faculty"], name="unique_department")
         ]
 
 
 class StudentProfile(BaseModel):
-    user = models.OneToOneField(User, null=True, on_delete=models.CASCADE, related_name="profile")
-    department = models.ForeignKey(Department, null=True, on_delete=models.DO_NOTHING, related_name="students")
-    level = models.ForeignKey(Level, null=True, on_delete=models.DO_NOTHING, related_name="students")
+    user = models.OneToOneField(
+        User, null=True, on_delete=models.CASCADE, related_name="profile"
+    )
+    department = models.ForeignKey(
+        Department, null=True, on_delete=models.DO_NOTHING, related_name="students"
+    )
+    level = models.ForeignKey(
+        Level, null=True, on_delete=models.DO_NOTHING, related_name="students"
+    )
     matric_no = models.CharField(max_length=12, unique=True)
     date_of_birth = models.DateField(null=True, blank=True)
     address = models.CharField(max_length=255, null=True, blank=True)
-    phone_number = models.CharField(max_length=15, null=True, blank=True, validators=[validate_phone_number])
+    phone_number = models.CharField(
+        max_length=15, null=True, blank=True, validators=[validate_phone_number]
+    )
 
     def get_full_name(self):
         return self.user.get_full_name()
