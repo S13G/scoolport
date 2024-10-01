@@ -11,7 +11,7 @@ User = get_user_model()
 
 def validate_email_address(value: str) -> str:
     """
-    Validates an email address.
+    Validate an email address.
     Parameters:
         value (str): The email address to be validated.
     Returns:
