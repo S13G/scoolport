@@ -76,11 +76,6 @@ REST_FRAMEWORK = {
     "NON_FIELD_ERRORS_KEY": "error",
 }
 
-AUTHENTICATION_BACKENDS = [
-    "apps.core.selectors.MatricNoBackend",
-    "django.contrib.auth.backends.ModelBackend",  # Default backend for admin login (email)
-]
-
 CORS_ALLOW_HEADERS = (
     "accept",
     "accept-language",

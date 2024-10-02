@@ -1,10 +1,11 @@
-from django.contrib.auth import get_user_model, authenticate
+from django.contrib.auth import get_user_model
 from django.core import validators
 from django.core.validators import validate_email
 from rest_framework import serializers as sr, status
 
 from apps.common.errors import ErrorCode
 from apps.common.exceptions import RequestError
+from apps.core.selectors import authenticate
 
 User = get_user_model()
 
@@ -39,7 +40,7 @@ class LoginSerializer(sr.Serializer):
             raise RequestError(
                 err_code=ErrorCode.INVALID_CREDENTIALS,
                 err_msg="Invalid credentials",
-                status_code=status.HTTP_401_UNAUTHORIZED,
+                status_code=status.HTTP_400_BAD_REQUEST,
             )
 
         return {"user": user}
