@@ -26,6 +26,34 @@ REGISTRATION
 """
 
 
+class EmailLoginView(APIView):
+    serializer_class = EmailLoginSerializer
+    throttle_classes = [UserRateThrottle]
+
+    @email_login_docs()
+    @transaction.atomic
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = serializer.validated_data["user"]
+
+        # Generate JWT tokens
+        refresh = RefreshToken.for_user(user)
+
+        tokens = {
+            "refresh": str(refresh),
+            "access": str(refresh.access_token),  # noqa
+        }
+
+        # serialized_data
+        profile = StudentProfileSerializer(user.profile).data
+        response_data = {"tokens": tokens, "profile": profile}
+        return CustomResponse.success(
+            message="Logged in successfully", data=response_data
+        )
+
+
 class LoginView(APIView):
     serializer_class = LoginSerializer
     throttle_classes = [UserRateThrottle]

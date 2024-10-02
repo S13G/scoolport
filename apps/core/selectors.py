@@ -9,7 +9,8 @@ def authenticate(matric_no=None, password=None):
     try:
         profile = StudentProfile.objects.get(matric_no=matric_no)
         user = profile.user
-        if user.check_password(password):
+
+        if user and user.check_password(password):
             return user
     except StudentProfile.DoesNotExist:
         return None

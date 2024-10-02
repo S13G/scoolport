@@ -1,6 +1,51 @@
 from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiExample
 
-from apps.core.serializers import LoginSerializer
+from apps.core.serializers import LoginSerializer, EmailLoginSerializer
+
+
+def email_login_docs():
+    return extend_schema(
+        summary="Login Endpoint",
+        description="""
+        This endpoint allows a user to login with their email and password and this returns a refresh and access tokens 
+        along with the student profile details.
+        """,
+        request=EmailLoginSerializer,
+        tags=["Authentication"],
+        responses={
+            200: OpenApiResponse(
+                description="Success",
+                response={"application/json"},
+                examples=[
+                    OpenApiExample(
+                        name="Success",
+                        value={
+                            "status": "success",
+                            "message": "Logged in successfully",
+                            "data": {
+                                "tokens": {"refresh": "<token>", "access": "<token>"},
+                                "profile": {
+                                    "user_info": {
+                                        "id": "416e8c37-d9ad-4c73-9b51-d5d557d00e6e",
+                                        "first_name": "John",
+                                        "last_name": "Doe",
+                                        "email": "student1@gmail.com",
+                                    },
+                                    "profile_id": "a27185ea-c6d6-4e81-ae5b-ff1ea1dc4967",
+                                    "department": "Computer Science - Faculty of Computing and Informatics",
+                                    "level": "100L",
+                                    "matric_no": "202407000002",
+                                    "date_of_birth": "2024-07-15",
+                                    "address": "Lagos Island",
+                                    "phone_number": "+234814170417",
+                                },
+                            },
+                        },
+                    )
+                ],
+            ),
+        },
+    )
 
 
 def login_docs():
