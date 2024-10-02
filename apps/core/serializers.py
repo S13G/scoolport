@@ -1,11 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.core import validators
 from django.core.validators import validate_email
-from rest_framework import serializers as sr, status
-
-from apps.common.errors import ErrorCode
-from apps.common.exceptions import RequestError
-from apps.core.selectors import authenticate
+from rest_framework import serializers as sr
 
 User = get_user_model()
 
@@ -26,46 +22,11 @@ def validate_email_address(value: str) -> str:
     return value
 
 
-class EmailLoginSerializer(sr.Serializer):
+class LoginSerializer(sr.Serializer):
     email = sr.CharField(
         validators=[validate_email_address], default="student1@gmail.com"
     )
     password = sr.CharField(write_only=True, default="Validpass#1234")
-
-    def validate(self, attrs):
-        email = attrs.get("email")
-        password = attrs.get("password")
-
-        try:
-            user = User.objects.get(email=email)
-            if user and user.check_password(password):
-                return {"user": user}
-        except User.DoesNotExist:
-            raise RequestError(
-                err_code=ErrorCode.INVALID_CREDENTIALS,
-                err_msg="Invalid credentials",
-                status_code=status.HTTP_400_BAD_REQUEST,
-            )
-
-
-class LoginSerializer(sr.Serializer):
-    matric_no = sr.CharField(default="202409000001", max_length=12)
-    password = sr.CharField(write_only=True, default="Validpass#1234")
-
-    def validate(self, attrs):
-        matric_no = attrs.get("matric_no")
-        password = attrs.get("password")
-
-        user = authenticate(matric_no=matric_no, password=password)
-
-        if user is None:
-            raise RequestError(
-                err_code=ErrorCode.INVALID_CREDENTIALS,
-                err_msg="Invalid credentials",
-                status_code=status.HTTP_400_BAD_REQUEST,
-            )
-
-        return {"user": user}
 
 
 class RegisterSerializer(sr.Serializer):

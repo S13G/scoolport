@@ -1,17 +1,21 @@
+from django.contrib.auth import authenticate
 from django.db import transaction
+from rest_framework import status
 from rest_framework.throttling import UserRateThrottle
-from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.serializers import (
     TokenBlacklistSerializer,
     TokenRefreshSerializer,
+    TokenObtainPairSerializer,
 )
-from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import (
     TokenBlacklistView,
     TokenRefreshView,
+    TokenObtainPairView,
 )
 
+from apps.common.errors import ErrorCode
+from apps.common.exceptions import RequestError
 from apps.common.responses import CustomResponse
 from apps.core.docs.docs import *
 from apps.core.serializers import *
@@ -26,52 +30,33 @@ REGISTRATION
 """
 
 
-class EmailLoginView(APIView):
-    serializer_class = EmailLoginSerializer
-    throttle_classes = [UserRateThrottle]
-
-    @email_login_docs()
-    @transaction.atomic
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        user = serializer.validated_data["user"]
-
-        # Generate JWT tokens
-        refresh = RefreshToken.for_user(user)
-
-        tokens = {
-            "refresh": str(refresh),
-            "access": str(refresh.access_token),  # noqa
-        }
-
-        # serialized_data
-        profile = StudentProfileSerializer(user.profile).data
-        response_data = {"tokens": tokens, "profile": profile}
-        return CustomResponse.success(
-            message="Logged in successfully", data=response_data
-        )
-
-
-class LoginView(APIView):
-    serializer_class = LoginSerializer
+class LoginView(TokenObtainPairView):
+    serializer_class = TokenObtainPairSerializer
     throttle_classes = [UserRateThrottle]
 
     @login_docs()
     @transaction.atomic
     def post(self, request):
-        serializer = self.serializer_class(data=request.data)
+        serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data["email"]
+        password = serializer.validated_data["password"]
 
-        user = serializer.validated_data["user"]
+        # authenticating user
+        user = authenticate(request, email=email, password=password)
 
-        # Generate JWT tokens
-        refresh = RefreshToken.for_user(user)
+        if not user:
+            raise RequestError(
+                err_code=ErrorCode.INVALID_CREDENTIALS,
+                err_msg="Invalid credentials",
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
 
+        # tokens
+        tokens_response = super().post(request)
         tokens = {
-            "refresh": str(refresh),
-            "access": str(refresh.access_token),  # noqa
+            "refresh": tokens_response.data["refresh"],
+            "access": tokens_response.data["access"],
         }
 
         # serialized_data
