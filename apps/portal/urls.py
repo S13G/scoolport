@@ -27,4 +27,7 @@ urlpatterns = [
         RetrieveAllSemestersRegisteredCoursesView.as_view(),
         name="retrieve-all-registered-courses",
     ),
+    path(
+        "live/results", RetrieveLiveResultsView.as_view(), name="retrieve-live-results"
+    ),
 ]

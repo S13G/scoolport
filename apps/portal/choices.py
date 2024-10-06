@@ -13,4 +13,13 @@ GRADE_CHOICES = (
     ("D", "D"),
     ("E", "E"),
     ("F", "F"),
+    ("AR", "AR"),
+)
+
+PASSED = "Passed"
+FAILED = "Failed"
+
+REMARK_CHOICES = (
+    (PASSED, "Passed"),
+    (FAILED, "Failed"),
 )

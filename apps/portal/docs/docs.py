@@ -369,3 +369,90 @@ def retrieve_all_semesters_registered_courses_docs():
             ),
         },
     )
+
+
+def live_result_docs():
+    return extend_schema(
+        summary="Retrieve live result",
+        description="This endpoint allows an authenticated user to retrieve live result",
+        tags=["Portal"],
+        parameters=[
+            OpenApiParameter(
+                "semester", OpenApiTypes.STR, description="Semester ID", required=True
+            ),
+            OpenApiParameter(
+                "level", OpenApiTypes.STR, description="Level ID", required=True
+            ),
+        ],
+        responses={
+            200: OpenApiResponse(
+                response={"application/json"},
+                description="Retrieved successfully",
+                examples=[
+                    OpenApiExample(
+                        name="Success response",
+                        value={
+                            "status": "success",
+                            "message": "Retrieved successfully",
+                            "data": {
+                                "current_semester": {
+                                    "total_units": 16,
+                                    "total_points": 72,
+                                    "gpa": 4.5,
+                                    "grade_class": "First Class",
+                                    "course_registrations": [
+                                        {
+                                            "course_code": "CSC101",
+                                            "course_name": "Computer Science 1",
+                                            "course_unit": 5,
+                                            "course_exam_score": 74,
+                                            "course_grade": "A",
+                                            "course_points": 25,
+                                        },
+                                        {
+                                            "course_code": "CSC102",
+                                            "course_name": "Computer Science 2",
+                                            "course_unit": 2,
+                                            "course_exam_score": 65,
+                                            "course_grade": "B",
+                                            "course_points": 8,
+                                        },
+                                        {
+                                            "course_code": "CLE104",
+                                            "course_name": "Cloud Engineering",
+                                            "course_unit": 3,
+                                            "course_exam_score": 88,
+                                            "course_grade": "A",
+                                            "course_points": 15,
+                                        },
+                                        {
+                                            "course_code": "CLE105",
+                                            "course_name": "Cloud Engineering 2",
+                                            "course_unit": 3,
+                                            "course_exam_score": 82,
+                                            "course_grade": "A",
+                                            "course_points": 15,
+                                        },
+                                        {
+                                            "course_code": "CSC103",
+                                            "course_name": "Computer Science 3",
+                                            "course_unit": 3,
+                                            "course_exam_score": 59,
+                                            "course_grade": "C",
+                                            "course_points": 9,
+                                        },
+                                    ],
+                                },
+                                "cumulative_semesters": {
+                                    "total_units": 16,
+                                    "total_points": 72,
+                                    "cgpa": 4.5,
+                                    "grade_class": "First Class",
+                                },
+                            },
+                        },
+                    ),
+                ],
+            ),
+        },
+    )

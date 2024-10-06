@@ -1,8 +1,10 @@
+from django.core.validators import MaxValueValidator
 from django.db import models
+from django.utils.functional import cached_property
 
 from apps.common.models import BaseModel
 from apps.core.models import StudentProfile, Level, Department
-from apps.portal.choices import SEMESTER_CHOICES, GRADE_CHOICES
+from apps.portal.choices import SEMESTER_CHOICES, GRADE_CHOICES, REMARK_CHOICES
 
 
 # Create your models here.
@@ -26,6 +28,30 @@ class Semester(BaseModel):
 
     def __str__(self):
         return f"{self.session.name} - {self.name}"
+
+
+class GradeLevel(BaseModel):
+    name = models.CharField(max_length=100)
+    min_point = models.FloatField()
+    max_point = models.FloatField()
+
+    class Meta:
+        ordering = ("created",)
+
+    def __str__(self):
+        return self.name
+
+
+class CourseGrade(BaseModel):
+    grade = models.CharField(max_length=2, choices=GRADE_CHOICES)
+    exam_score = models.IntegerField(null=True)
+    point = models.IntegerField(null=True)
+
+    class Meta:
+        ordering = ("created",)
+
+    def __str__(self):
+        return self.grade
 
 
 class Course(BaseModel):
@@ -69,6 +95,16 @@ class CourseRegistration(BaseModel):
     course = models.ForeignKey(
         Course, related_name="registrations", on_delete=models.DO_NOTHING
     )
+    exam_score = models.IntegerField(
+        null=True, blank=True, default=0, validators=[MaxValueValidator(100)]
+    )
+    course_grade = models.ForeignKey(
+        CourseGrade,
+        on_delete=models.DO_NOTHING,
+        related_name="course_registrations",
+        null=True,
+        blank=True,
+    )
     level = models.ForeignKey(
         Level,
         on_delete=models.DO_NOTHING,
@@ -76,6 +112,17 @@ class CourseRegistration(BaseModel):
         null=True,
     )
     registered_status = models.BooleanField(default=False)
+    remark = models.CharField(
+        max_length=6, null=True, blank=True, choices=REMARK_CHOICES
+    )
+
+    @cached_property
+    def calculated_course_point_after_exam(self):
+        return (
+            self.course_grade.point * self.course.unit
+            if self.course_grade
+            else "Not calculated yet"
+        )
 
     def __str__(self):
         return f"{self.student.get_full_name()} - {self.student.get_department_name()} {self.course.name}"
@@ -85,7 +132,8 @@ class Result(BaseModel):
     registration = models.OneToOneField(
         CourseRegistration, on_delete=models.DO_NOTHING, related_name="result"
     )
-    grade = models.CharField(max_length=1, choices=GRADE_CHOICES)
+    grade = models.CharField(max_length=2, choices=GRADE_CHOICES)
+
     gpa = models.DecimalField(max_digits=4, decimal_places=2)
     cgpa = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
 

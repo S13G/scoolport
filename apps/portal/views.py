@@ -3,10 +3,12 @@ from django.db.models import Sum
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
+from apps.common.errors import ErrorCode
+from apps.common.exceptions import RequestError
 from apps.common.responses import CustomResponse
 from apps.core.models import Level
 from apps.portal.docs.docs import *
-from apps.portal.models import Semester, Session, Course, CourseRegistration
+from apps.portal.models import Semester, Session, Course, CourseRegistration, GradeLevel
 from apps.portal.serializers import RegisterCourseSerializer, UnregisterCourseSerializer
 
 
@@ -259,3 +261,171 @@ class RetrieveAllSemestersRegisteredCoursesView(APIView):
         return CustomResponse.success(
             message="Retrieved successfully", data=registered_courses_by_semester
         )
+
+
+class RetrieveLiveResultsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    def calculate_cumulative_courses(student_profile):
+        cumulative_courses = CourseRegistration.objects.select_related(
+            "student", "course", "semester", "level"
+        ).filter(
+            student=student_profile,
+            registered_status=True,
+        )
+
+        # Cumulative calculations
+        cumulative_total_units = sum(
+            [course.course.unit for course in cumulative_courses]
+        )
+
+        cumulative_total_points = sum(
+            [
+                course.course.unit * course.course_grade.point
+                for course in cumulative_courses
+                if course.course_grade
+            ]
+        )
+
+        cumulative_gpa = (
+            cumulative_total_points / cumulative_total_units
+            if cumulative_total_units > 0
+            else 0
+        )
+
+        # Fetch the grade level for the cumulative GPA
+        return cumulative_gpa, cumulative_total_points, cumulative_total_units
+
+    @staticmethod
+    def calculate_current_semester(courses, total_points, total_units):
+        # Loop through each course registration to calculate total units and points
+        course_registrations = []
+
+        for course_registration in courses:
+            course = course_registration.course
+            course_grade = course_registration.course_grade
+
+            # Add course units to total units
+            total_units += course.unit
+
+            # Calculate points for the course if a grade is available
+            if course_grade:
+                course_points = course_grade.point * course.unit
+                total_points += course_points
+            else:
+                course_points = "Not graded yet"
+
+            # Collect data for each course
+            course_registrations.append(
+                {
+                    "course_code": course.course_code,
+                    "course_name": course.name,
+                    "course_unit": course.unit,
+                    "course_exam_score": course_registration.exam_score,
+                    "course_grade": course_grade.grade if course_grade else "No grade",
+                    "course_points": course_points,
+                }
+            )
+
+        try:
+            gpa_calculation = total_points / total_units if total_points > 0 else 0
+        except ZeroDivisionError:
+            gpa_calculation = None
+
+        try:
+            grade_class = GradeLevel.objects.get(
+                min_point__lte=gpa_calculation, max_point__gte=gpa_calculation
+            )
+        except GradeLevel.DoesNotExist:
+            grade_class = "No class found"
+
+        return (
+            course_registrations,
+            gpa_calculation,
+            grade_class,
+            total_points,
+            total_units,
+        )
+
+    @staticmethod
+    @live_result_docs()
+    def get(request, *args, **kwargs):
+        student_profile = request.user.profile
+        level = request.query_params.get("level")
+        semester = request.query_params.get("semester")
+
+        # Retrieve registered courses for the student
+        courses = CourseRegistration.objects.select_related(
+            "student", "course", "semester", "level"
+        ).filter(
+            student=student_profile,
+            registered_status=True,
+            semester=semester,
+            level=level,
+        )
+        print(courses)
+
+        # Initialize variables to store total units and total points
+        total_units = 0
+        total_points = 0
+
+        if courses.exists():
+            (
+                course_registrations,
+                gpa_calculation,
+                grade_class,
+                total_points,
+                total_units,
+            ) = RetrieveLiveResultsView.calculate_current_semester(
+                courses, total_points, total_units
+            )
+            current_semester_data = {
+                "total_units": total_units,
+                "total_points": total_points,
+                "gpa": gpa_calculation,
+                "grade_class": (
+                    grade_class.name if grade_class else "No grade class"  # noqa
+                ),
+                "course_registrations": course_registrations,
+            }
+        else:
+            # If no courses are registered for the current semester
+            current_semester_data = "No courses found for the current semester"
+
+        # Retrieve cumulative courses for the student
+        cumulative_gpa, cumulative_total_points, cumulative_total_units = (
+            RetrieveLiveResultsView.calculate_cumulative_courses(student_profile)
+        )
+
+        if cumulative_total_units > 0:
+            cumulative_grade_class = GradeLevel.objects.get(
+                min_point__lte=cumulative_gpa, max_point__gte=cumulative_gpa
+            )
+            cumulative_semester_data = {
+                "total_units": cumulative_total_units,
+                "total_points": cumulative_total_points,
+                "cgpa": cumulative_gpa,
+                "grade_class": cumulative_grade_class.name,
+            }
+        else:
+            # If no cumulative data is available
+            cumulative_semester_data = "No cumulative data found"
+
+            # Handle both current semester and cumulative data being absent
+        if (
+            current_semester_data == "No courses found for the current semester"
+            and cumulative_semester_data == "No cumulative data found"
+        ):
+            return RequestError(
+                err_code=ErrorCode.NON_EXISTENT,
+                err_msg="No data found",
+                status_code=404,
+            )
+
+        data = {
+            "current_semester": current_semester_data,
+            "cumulative_semesters": cumulative_semester_data,
+        }
+
+        return CustomResponse.success(message="Retrieved successfully", data=data)
