@@ -30,4 +30,5 @@ urlpatterns = [
     path(
         "live/results", RetrieveLiveResultsView.as_view(), name="retrieve-live-results"
     ),
+    path("dashboard", RetrieveDashboardView.as_view(), name="dashboard"),
 ]

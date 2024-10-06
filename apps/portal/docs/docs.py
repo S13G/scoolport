@@ -200,7 +200,9 @@ def retrieve_courses_to_register_docs():
 def retrieve_registered_courses_docs():
     return extend_schema(
         summary="Retrieve registered courses",
-        description="This endpoint allows an authenticated user to retrieve registered courses",
+        description="""
+        This endpoint allows an authenticated user to retrieve registered courses
+        """,
         tags=["Portal"],
         responses={
             200: OpenApiResponse(
@@ -249,7 +251,9 @@ def retrieve_registered_courses_docs():
 def register_courses_docs():
     return extend_schema(
         summary="Register courses",
-        description="This endpoint allows an authenticated user to register courses",
+        description="""
+        This endpoint allows an authenticated user to register courses
+        """,
         tags=["Portal"],
         request=RegisterCourseSerializer,
         responses={
@@ -273,7 +277,9 @@ def register_courses_docs():
 def unregister_course_docs():
     return extend_schema(
         summary="Unregister courses",
-        description="This endpoint allows an authenticated user to unregister courses",
+        description="""
+        This endpoint allows an authenticated user to unregister courses
+        """,
         tags=["Portal"],
         request=UnregisterCourseSerializer,
         responses={
@@ -297,7 +303,9 @@ def unregister_course_docs():
 def retrieve_all_semesters_registered_courses_docs():
     return extend_schema(
         summary="Retrieve all semesters registered courses",
-        description="This endpoint allows an authenticated user to retrieve all semesters registered courses",
+        description="""
+        This endpoint allows an authenticated user to retrieve all semesters registered courses
+        """,
         tags=["Portal"],
         responses={
             200: OpenApiResponse(
@@ -374,7 +382,9 @@ def retrieve_all_semesters_registered_courses_docs():
 def live_result_docs():
     return extend_schema(
         summary="Retrieve live result",
-        description="This endpoint allows an authenticated user to retrieve live result",
+        description="""
+        This endpoint allows an authenticated user to retrieve live result
+        """,
         tags=["Portal"],
         parameters=[
             OpenApiParameter(
@@ -449,6 +459,37 @@ def live_result_docs():
                                     "cgpa": 4.5,
                                     "grade_class": "First Class",
                                 },
+                            },
+                        },
+                    ),
+                ],
+            ),
+        },
+    )
+
+
+def dashboard_docs():
+    return extend_schema(
+        summary="Retrieve dashboard",
+        description="""
+        This endpoint allows an authenticated user to retrieve dashboard
+        """,
+        tags=["Portal"],
+        responses={
+            200: OpenApiResponse(
+                response={"application/json"},
+                description="Retrieved successfully",
+                examples=[
+                    OpenApiExample(
+                        name="Success response",
+                        value={
+                            "status": "success",
+                            "message": "Retrieved successfully",
+                            "data": {
+                                "num_of_all_registered_courses": 5,
+                                "cumulative_gpa": 4.5,
+                                "total_num_of_carryovers": 0,
+                                "total_units": 0,
                             },
                         },
                     ),

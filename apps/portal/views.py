@@ -429,3 +429,38 @@ class RetrieveLiveResultsView(APIView):
         }
 
         return CustomResponse.success(message="Retrieved successfully", data=data)
+
+
+class RetrieveDashboardView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    @dashboard_docs()
+    def get(request, *args, **kwargs):
+        student_profile = request.user.profile
+        course_registrations = CourseRegistration.objects.select_related(
+            "student", "course", "semester", "level"
+        ).filter(student=student_profile, registered_status=True)
+
+        num_of_all_registered_courses = course_registrations.count()
+        total_units = 0
+        total_num_of_carryovers = 0
+
+        # Retrieve cumulative courses for the student
+        cumulative_gpa, cumulative_total_points, _ = (
+            RetrieveLiveResultsView.calculate_cumulative_courses(student_profile)
+        )
+
+        # Calculate carryovers(using how many Fs were carried over)
+        for course in course_registrations:
+            if course.course_grade.grade == "F":
+                total_num_of_carryovers += 1
+
+        data = {
+            "num_of_all_registered_courses": num_of_all_registered_courses,
+            "cumulative_gpa": cumulative_gpa,
+            "total_num_of_carryovers": total_num_of_carryovers,
+            "total_units": total_units,
+        }
+
+        return CustomResponse.success(message="Retrieved successfully", data=data)
