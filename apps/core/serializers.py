@@ -3,6 +3,8 @@ from django.core import validators
 from django.core.validators import validate_email
 from rest_framework import serializers as sr
 
+from apps.portal.models import Semester
+
 User = get_user_model()
 
 
@@ -54,9 +56,15 @@ class UserSerializer(sr.ModelSerializer):
 class StudentProfileSerializer(sr.Serializer):
     user_info = UserSerializer(source="user")
     profile_id = sr.UUIDField(source="id")
+    semester_id = sr.SerializerMethodField()
     department = sr.CharField()
     level = sr.CharField()
+    level_id = sr.CharField(source="level.id")
     matric_no = sr.CharField()
     date_of_birth = sr.DateField()
     address = sr.CharField()
     phone_number = sr.CharField()
+
+    @staticmethod
+    def get_semester_id(obj):  # noqa
+        return Semester.objects.latest().id
