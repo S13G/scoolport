@@ -453,12 +453,12 @@ class RetrieveDashboardView(APIView):
 
         # Calculate carryovers(using how many Fs were carried over)
         for course in course_registrations:
-            if course.course_grade.grade == "F":
+            if course.course_grade is not None and course.course_grade.grade == "F":
                 total_num_of_carryovers += 1
 
         data = {
             "num_of_all_registered_courses": num_of_all_registered_courses,
-            "cumulative_gpa": cumulative_gpa,
+            "cumulative_gpa": round(cumulative_gpa, 2) if cumulative_gpa else 0,
             "total_num_of_carryovers": total_num_of_carryovers,
             "total_units": total_units,
         }
