@@ -151,10 +151,10 @@ class RetrieveRegisteredCoursesView(APIView):
 
         # Aggregate course units
         total_units = (
-            course_registrations.values("course__unit").aggregate(
-                total_units=Sum("course__unit")
-            )["total_units"]
-            or 0
+                course_registrations.values("course__unit").aggregate(
+                    total_units=Sum("course__unit")
+                )["total_units"]
+                or 0
         )
 
         # Retrieve course details
@@ -228,10 +228,10 @@ class RetrieveAllSemestersRegisteredCoursesView(APIView):
 
             # Aggregate course units
             total_units = (
-                course_registrations.values("course__unit").aggregate(
-                    total_units=Sum("course__unit")
-                )["total_units"]
-                or 0
+                    course_registrations.values("course__unit").aggregate(
+                        total_units=Sum("course__unit")
+                    )["total_units"]
+                    or 0
             )
 
             # Retrieve course details
@@ -364,7 +364,6 @@ class RetrieveLiveResultsView(APIView):
             semester=semester,
             level=level,
         )
-        print(courses)
 
         # Initialize variables to store total units and total points
         total_units = 0
@@ -414,8 +413,8 @@ class RetrieveLiveResultsView(APIView):
 
             # Handle both current semester and cumulative data being absent
         if (
-            current_semester_data == "No courses found for the current semester"
-            and cumulative_semester_data == "No cumulative data found"
+                current_semester_data == "No courses found for the current semester"
+                and cumulative_semester_data == "No cumulative data found"
         ):
             return RequestError(
                 err_code=ErrorCode.NON_EXISTENT,
