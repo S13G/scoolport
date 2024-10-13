@@ -151,10 +151,10 @@ class RetrieveRegisteredCoursesView(APIView):
 
         # Aggregate course units
         total_units = (
-                course_registrations.values("course__unit").aggregate(
-                    total_units=Sum("course__unit")
-                )["total_units"]
-                or 0
+            course_registrations.values("course__unit").aggregate(
+                total_units=Sum("course__unit")
+            )["total_units"]
+            or 0
         )
 
         # Retrieve course details
@@ -184,7 +184,7 @@ class UnregisterCourseView(APIView):
         student_profile = request.user.profile
         latest_semester = Semester.objects.latest()
         serializer = self.serializer_class(
-            data=request.data, context={"request": request}
+            data=request.data, context={"student_profile": student_profile}
         )
         serializer.is_valid(raise_exception=True)
 
@@ -228,10 +228,10 @@ class RetrieveAllSemestersRegisteredCoursesView(APIView):
 
             # Aggregate course units
             total_units = (
-                    course_registrations.values("course__unit").aggregate(
-                        total_units=Sum("course__unit")
-                    )["total_units"]
-                    or 0
+                course_registrations.values("course__unit").aggregate(
+                    total_units=Sum("course__unit")
+                )["total_units"]
+                or 0
             )
 
             # Retrieve course details
@@ -413,8 +413,8 @@ class RetrieveLiveResultsView(APIView):
 
             # Handle both current semester and cumulative data being absent
         if (
-                current_semester_data == "No courses found for the current semester"
-                and cumulative_semester_data == "No cumulative data found"
+            current_semester_data == "No courses found for the current semester"
+            and cumulative_semester_data == "No cumulative data found"
         ):
             return RequestError(
                 err_code=ErrorCode.NON_EXISTENT,

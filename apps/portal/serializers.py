@@ -77,19 +77,20 @@ class UnregisterCourseSerializer(serializers.Serializer):
         if not Course.objects.filter(id=course_id).exists():
             raise serializers.ValidationError("Course not found.")
 
-        # Check if course is already registered
+        # Check if course is already unregistered
         if (
-            not CourseRegistration.objects.select_related(
+            CourseRegistration.objects.select_related(
                 "student", "course", "semester", "level"
             )
             .filter(
-                student=self.context["request"].user.profile,
+                student=self.context["student_profile"],
                 course__id=course_id,
                 semester=latest_semester,
                 level=level,
+                registered_status=False,
             )
             .exists()
         ):
-            raise serializers.ValidationError("Course not registered.")
+            raise serializers.ValidationError("Course already unregistered.")
 
         return attrs
