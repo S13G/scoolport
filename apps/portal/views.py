@@ -443,11 +443,10 @@ class RetrieveDashboardView(APIView):
         ).filter(student=student_profile, registered_status=True)
 
         num_of_all_registered_courses = course_registrations.count()
-        total_units = 0
         total_num_of_carryovers = 0
 
         # Retrieve cumulative courses for the student
-        cumulative_gpa, cumulative_total_points, _ = (
+        cumulative_gpa, _, cumulative_total_units = (
             RetrieveLiveResultsView.calculate_cumulative_courses(student_profile)
         )
 
@@ -460,7 +459,7 @@ class RetrieveDashboardView(APIView):
             "num_of_all_registered_courses": num_of_all_registered_courses,
             "cumulative_gpa": round(cumulative_gpa, 2) if cumulative_gpa else 0,
             "total_num_of_carryovers": total_num_of_carryovers,
-            "total_units": total_units,
+            "total_units": cumulative_total_units,
         }
 
         return CustomResponse.success(message="Retrieved successfully", data=data)
